@@ -1,0 +1,24 @@
+module Row(input logic clk, reset,
+				input logic [1:0] state,
+				input logic [21:0] prev,write
+				output logic [21:0] next, 
+				output logic moving_in );
+//states 
+// 00-not_move
+// 01-move
+// 10-write select
+				
+logic [21:0] row;
+
+alway_ff@(posedge clk)
+begin 
+if(reset)
+row <= 22'h00000;
+else if(state= 2'b00)
+row <= row;
+else if(state = 2'b01)
+row <= prev;
+else if(state = 2'b10)
+row <= write;
+end				
+endmodule 

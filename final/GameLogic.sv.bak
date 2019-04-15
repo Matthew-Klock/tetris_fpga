@@ -1,0 +1,41 @@
+module GameLogic(
+	input logic clk, reset
+	input logic Stop, endgame, 
+	input logic [21:0] Shift,
+	input logic [1:0] peiceMove, check, drop, newPeice 
+	
+	output logic [1:0] state,
+	output logic [21:0] shift_row
+	); 
+	
+	
+/*
+
+
+00 --> peiceMove
+01 --> check
+10 --> drop
+11 --> newPeice 
+
+
+*/
+	
+
+	always_ff @ (posedge clk)
+	begin
+	if(reset)
+			begin 
+			peiceMove <= 2'b00; 
+			check <= 2'b00; 
+			drop <= 2'b00; 
+			newPeice <= 2'b00; 
+			endgame <= 1'b0; 
+	
+	end
+	
+	
+	
+	
+	
+	
+endmodule 
