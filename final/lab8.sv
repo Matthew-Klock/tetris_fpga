@@ -180,10 +180,10 @@ module lab8( input               CLOCK_50,
 	Block block21( .clk(VGA_VS), .reset(Reset_h), .state, .prev(9'b0), .write(new_block[0]), .collision(rows[20]), .next(blocks_in[21]) , .Stop(stop[21]), .endgame(gameOver[0]));
     Block block20( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[21]), .write(new_block[1]), .collision(rows[19]), .next(blocks_in[20]), .Stop(stop[20]), .endgame(gameOver[1]));
     Block block19( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[20]), .write(rows[19]), .collision(rows[18]), .next(blocks_in[19]), .Stop(stop[19]));
-    Block block18( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[19]), .write(rows[18]), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[19]));
-    Block block17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[18]), .write(rows[17]), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[19]));
-    Block block16( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[17]), .write(rows[16]), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[19]));
-    Block block15( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[16]), .write(rows[15]), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[19]));
+    Block block18( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[19]), .write(rows[18]), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[18]));
+    Block block17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[18]), .write(rows[17]), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[17]));
+    Block block16( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[17]), .write(rows[16]), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[16]));
+    Block block15( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[16]), .write(rows[15]), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[15]));
     Block block14( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[15]), .write(rows[14]), .collision(rows[13]), .next(blocks_in[14]), .Stop(stop[19]));
 	Block block13( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[14]), .write(rows[13]), .collision(rows[12]), .next(blocks_in[13]), .Stop(stop[19]));
     Block block12( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[13]), .write(rows[12]), .collision(rows[11]), .next(blocks_in[12]), .Stop(stop[19]));
