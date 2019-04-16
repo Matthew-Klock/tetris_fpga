@@ -58,8 +58,10 @@ module lab8( input               CLOCK_50,
     logic [1:0] hpi_addr;
     logic [15:0] hpi_data_in, hpi_data_out;
     logic hpi_r, hpi_w, hpi_cs, hpi_reset;
-    logic [9:0] ballx, bally;
-	 logic isball;
+    //current pixel being drawn
+	 logic [9:0] DrawX, DrawY;
+	 //tells the color mapper to draw a block or not
+	 logic is_block;
 	 //rows
 	 logic [9:0] rows [21:0];
 	//refreshes rows
@@ -147,8 +149,8 @@ module lab8( input               CLOCK_50,
     VGA_controller vga_controller_instance(
 	.*,
 	.Reset(Reset_h),
-	.DrawX(ballx),
-	.DrawY(bally),
+	.DrawX,
+	.DrawY
 	 
 	 );
     
@@ -158,6 +160,12 @@ module lab8( input               CLOCK_50,
 
 	 
 	 mapper mapp(.rows, .blocks, .map_b);
+//	 always_comb
+//	 begin
+//	 for(int i=0; i<22; i++)
+//		map_b[i] = 10'b1010101010;
+//	 end
+	 block_mapper bmap(.DrawX, .DrawY, .map, .is_block(is_block));
 	 
 	 //clocked  off the VGA_VS 
 	 //writes from the map when ws is high
@@ -211,13 +219,15 @@ module lab8( input               CLOCK_50,
     Block block1( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[2]), .write(10'h0000), .collision(rows[0]), .next(blocks_in[1]), .Stop(stop[1]));
     Block block0( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[1]), .write(10'h0000), .collision(10'hFFFF), .next(blocks_in[0]), .Stop(stop[0]));
 	
+	
+	 
 	 
 	 
 	 color_mapper color_instance(
 	 .*,
-	 .is_ball(isball),
-	 .DrawX(ballx),
-	 .DrawY(bally)
+	 .is_block(is_block),
+	 .DrawX,
+	 .DrawY
 	 );
     
     // Display keycode on hex display

@@ -4,7 +4,7 @@ module GameLogic(
 	input logic [21:0] shift, stop, 
 	
 	
-	output logic [1:0] out_state,
+	output logic [2:0] out_state,
 	output logic [21:0] shift_row
 	); 
 	
@@ -31,11 +31,23 @@ module GameLogic(
 						HALT
 	
 	} state, next_state; 
-	
+	int i;
 	
 	always_ff @ (posedge clk)
 		begin 
-			state <= next_state; 
+		if(reset)
+		begin
+			state <= check_block;
+			i = 0;
+		end
+		else
+			if(i == 300 )//|| state != move_block)
+			begin
+			state <= next_state;
+			i = 0;
+			end
+			else 
+				i++;
 		end
 		
 		
@@ -52,10 +64,11 @@ module GameLogic(
 		//check keeps checking until shift is negative
 		check_block:     	
 			begin
+
 			if(shift != 21'h0)
-				next_state = shift_down_rows; 
+				next_state =shift_down_rows;
 			else
-				next_state = add_block;
+				next_state = add_block; 
 			end 			
 		//shift down rows unconditionally goes back to check
 		shift_down_rows:
@@ -73,7 +86,7 @@ module GameLogic(
 		//move block loops until stop signal
 		move_block:
 			begin
-			if(stop != 21'h0 )
+			if(stop == 21'h0 )
 				next_state = move_block; 
 			else
 				next_state = write_block_to_rows; 

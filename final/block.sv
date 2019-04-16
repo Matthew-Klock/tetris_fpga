@@ -15,7 +15,7 @@ module Block (input logic clk, reset,
 // 000 - endgame/HALT
 logic [9:0] row;
 
-always_ff @ (posedge clk)
+always_ff @ (posedge clk, posedge reset)
 begin 
  
 if(reset)

@@ -13,7 +13,7 @@ module Row(input logic clk, reset, shift_row,
 				
 logic [9:0] row;
 
-always_ff @ (posedge clk)
+always_ff @ (posedge clk, posedge reset)
 begin 
 
 if(reset)
