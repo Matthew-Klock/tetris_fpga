@@ -75,21 +75,25 @@ module lab8( input               CLOCK_50,
 	 //output to write the piece to the two rows
 	 logic [9:0] write [1:0];
 	 //defines what/if rows are full and are giving the
-	 logic [21:0] full; 
+	 logic [21:0] shift; 
 	 //tell what rows to shift 
 	 logic [21:0] shift_row;
 	 //tells the piece to stop moving and to write it to the rows
      logic [21:0] stop;
      //tells the game to stop because it's donezo
      //only hooked up for the top two because they are the only ones that matter.
-     logic [1:0] gameOver;	 
+     logic [1:0] gameOver;
+     //the state of the game (what the blocks should do)
+     logic [2:0] state;	 
+	  //new blocks
+	  logic [9:0] new_block [1:0];
 	 always_ff @ (posedge Clk) begin 
-	  
-		  if(stop == 1'b1)
-		   rows <= map;
-		  else
 		  	rows <= rows_in;        
+            blocks <= blocks_in;
+            map <= map_b;
     end
+
+
     // Interface between NIOS II and EZ-OTG chip
     hpi_io_intf hpi_io_inst(
                             .Clk(Clk),
@@ -148,6 +152,10 @@ module lab8( input               CLOCK_50,
 	 
 	 );
     
+    GameLogic game(.clk(VGA_VS), .reset(Reset_h), .shift, .stop, .gameOver, .shift_row, .out_state(state)); 
+
+	 next_Block block(.block(3'b000), .new_block);
+
 	 //clocked  off the VGA_VS 
 	 //writes from the map when ws is high
 	 //outputs next to its respective row
@@ -157,7 +165,7 @@ module lab8( input               CLOCK_50,
 	 Row row20( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[21]) ,.write(map[20]), .next(rows_in[20]), .shift_row(shift_row[20])  , .shift(shift[20]));
 	 Row row19( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[20]) ,.write(map[19]), .next(rows_in[19]), .shift_row(shift_row[19])  , .shift(shift[19]));
 	 Row row18( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[19]) ,.write(map[18]), .next(rows_in[18]),  .shift_row(shift_row[18])  , .shift(shift[18]));
-     Row row17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[18]) ,.write(map[17]), .next(rows_in[17]),  .shift_row(shift_row[17])  , .shift(shift[17]));
+    Row row17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[18]) ,.write(map[17]), .next(rows_in[17]),  .shift_row(shift_row[17])  , .shift(shift[17]));
 	 Row row16( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[17]) ,.write(map[16]), .next(rows_in[16]),  .shift_row(shift_row[16])  , .shift(shift[16]));
 	 Row row15( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[16]) ,.write(map[15]), .next(rows_in[15]),  .shift_row(shift_row[15])  , .shift(shift[15]));
 	 Row row14( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[15]) ,.write(map[14]), .next(rows_in[14]),  .shift_row(shift_row[14])  , .shift(shift[14]));
@@ -175,30 +183,30 @@ module lab8( input               CLOCK_50,
 	 Row row02( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[03]) ,.write(map[2]), .next(rows_in[02]),  .shift_row(shift_row[2])  , .shift(shift[2]));
 	 Row row01( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[02]) ,.write(map[1]), .next(rows_in[01]),  .shift_row(shift_row[1])  , .shift(shift[1]));
      Row row00( .clk(VGA_VS), .reset(Reset_h), .state, .prev(rows[01]) ,.write(map[0]), .next(rows_in[00]),  .shift_row(shift_row[0])  , .shift(shift[0]));
-    
-	 
-	Block block21( .clk(VGA_VS), .reset(Reset_h), .state, .prev(9'b0), .write(new_block[0]), .collision(rows[20]), .next(blocks_in[21]) , .Stop(stop[21]), .endgame(gameOver[0]));
+    //write is 
+	//stop stops the block from falling 
+	Block block21( .clk(VGA_VS), .reset(Reset_h), .state, .prev(9'b0),       .write(new_block[0]), .collision(rows[20]), .next(blocks_in[21]) , .Stop(stop[21]), .endgame(gameOver[0]));
     Block block20( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[21]), .write(new_block[1]), .collision(rows[19]), .next(blocks_in[20]), .Stop(stop[20]), .endgame(gameOver[1]));
-    Block block19( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[20]), .write(rows[19]), .collision(rows[18]), .next(blocks_in[19]), .Stop(stop[19]));
-    Block block18( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[19]), .write(rows[18]), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[18]));
-    Block block17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[18]), .write(rows[17]), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[17]));
-    Block block16( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[17]), .write(rows[16]), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[16]));
-    Block block15( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[16]), .write(rows[15]), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[15]));
-    Block block14( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[15]), .write(rows[14]), .collision(rows[13]), .next(blocks_in[14]), .Stop(stop[19]));
-	Block block13( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[14]), .write(rows[13]), .collision(rows[12]), .next(blocks_in[13]), .Stop(stop[19]));
-    Block block12( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[13]), .write(rows[12]), .collision(rows[11]), .next(blocks_in[12]), .Stop(stop[19]));
-    Block block11( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[12]), .write(rows[11]), .collision(rows[10]), .next(blocks_in[11]), .Stop(stop[19]));
-    Block block10( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[11]), .write(rows[10]), .collision(rows[9]), .next(blocks_in[10]), .Stop(stop[19]));
-    Block block9( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[10]), .write(rows[9]), .collision(rows[8]), .next(blocks_in[9]), .Stop(stop[19]));
-    Block block8( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[9]), .write(rows[8]), .collision(rows[7]), .next(blocks_in[8]), .Stop(stop[19]));
-    Block block7( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[8]), .write(rows[7]), .collision(rows[6]), .next(blocks_in[7]), .Stop(stop[19]));
-    Block block6( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[7]), .write(rows[6]), .collision(rows[5]), .next(blocks_in[6]), .Stop(stop[19]));
-    Block block5( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[6]), .write(rows[5]), .collision(rows[4]), .next(blocks_in[5]), .Stop(stop[19]));
-    Block block4( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[5]), .write(rows[4]), .collision(rows[3]), .next(blocks_in[4]), .Stop(stop[19]));
-    Block block3( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[4]), .write(rows[3]), .collision(rows[2]), .next(blocks_in[3]), .Stop(stop[19]));
-    Block block2( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[3]), .write(rows[2]), .collision(rows[1]), .next(blocks_in[2]), .Stop(stop[19]));
-    Block block1( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[2]), .write(rows[1]), .collision(rows[0]), .next(blocks_in[1]), .Stop(stop[19]));
-    Block block0( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[1]), .write(rows[0]), .collision(10'h0000), .next(blocks_in[0]), .Stop(stop[19]));
+    Block block19( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[20]), .write(10'h0000), .collision(rows[18]), .next(blocks_in[19]), .Stop(stop[19]));
+    Block block18( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[19]), .write(10'h0000), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[18]));
+    Block block17( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[18]), .write(10'h0000), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[17]));
+    Block block16( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[17]), .write(10'h0000), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[16]));
+    Block block15( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[16]), .write(10'h0000), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[15]));
+    Block block14( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[15]), .write(10'h0000), .collision(rows[13]), .next(blocks_in[14]), .Stop(stop[14]));
+	Block block13( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[14]), .write(10'h0000), .collision(rows[12]), .next(blocks_in[13]), .Stop(stop[13]));
+    Block block12( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[13]), .write(10'h0000), .collision(rows[11]), .next(blocks_in[12]), .Stop(stop[12]));
+    Block block11( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[12]), .write(10'h0000), .collision(rows[10]), .next(blocks_in[11]), .Stop(stop[11]));
+    Block block10( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[11]), .write(10'h0000), .collision(rows[9]), .next(blocks_in[10]), .Stop(stop[10]));
+    Block block9( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[10]), .write(10'h0000), .collision(rows[8]), .next(blocks_in[9]), .Stop(stop[9]));
+    Block block8( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[9]), .write(10'h0000), .collision(rows[7]), .next(blocks_in[8]), .Stop(stop[8]));
+    Block block7( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[8]), .write(10'h0000), .collision(rows[6]), .next(blocks_in[7]), .Stop(stop[7]));
+    Block block6( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[7]), .write(10'h0000), .collision(rows[5]), .next(blocks_in[6]), .Stop(stop[6]));
+    Block block5( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[6]), .write(10'h0000), .collision(rows[4]), .next(blocks_in[5]), .Stop(stop[5]));
+    Block block4( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[5]), .write(10'h0000), .collision(rows[3]), .next(blocks_in[4]), .Stop(stop[4]));
+    Block block3( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[4]), .write(10'h0000), .collision(rows[2]), .next(blocks_in[3]), .Stop(stop[3]));
+    Block block2( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[3]), .write(10'h0000), .collision(rows[1]), .next(blocks_in[2]), .Stop(stop[2]));
+    Block block1( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[2]), .write(10'h0000), .collision(rows[0]), .next(blocks_in[1]), .Stop(stop[1]));
+    Block block0( .clk(VGA_VS), .reset(Reset_h), .state, .prev(blocks[1]), .write(10'h0000), .collision(10'hFFFF), .next(blocks_in[0]), .Stop(stop[0]));
 	
 	 
 	 
@@ -207,7 +215,6 @@ module lab8( input               CLOCK_50,
 	 .is_ball(isball),
 	 .DrawX(ballx),
 	 .DrawY(bally)
-	 
 	 );
     
     // Display keycode on hex display
