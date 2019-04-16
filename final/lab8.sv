@@ -156,6 +156,9 @@ module lab8( input               CLOCK_50,
 
 	 next_Block block(.block(3'b000), .new_block);
 
+	 
+	 mapper mapp(.rows, .blocks, .map_b);
+	 
 	 //clocked  off the VGA_VS 
 	 //writes from the map when ws is high
 	 //outputs next to its respective row
