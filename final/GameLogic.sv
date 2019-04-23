@@ -25,9 +25,11 @@ module GameLogic(
 	
 						check_block, 
 						move_block, 
-						write_block_to_rows, 
+						write_block_to_rows,
+						write_block_to_rows_2,	
 						shift_down_rows,  
 						add_block, 
+						add_block_2,
 						HALT
 	
 	} state, next_state; 
@@ -38,14 +40,18 @@ module GameLogic(
 		if(reset)
 		begin
 			state <= check_block;
-			i = 0;
+			i = 1;
 		end
 		else
-			if(i == 300 )//|| state != move_block)
-			begin
 			state <= next_state;
-			i = 0;
-			end
+			if(state == add_block_2)
+			i <= 1;
+			//if(i == 2 || next_state != add_block || next_state != write_block_to_rows)
+//			if(i == 300 ) || state != move_block)
+			//begin
+			//state <= next_state;
+			//i = 0;
+			//end
 			else 
 				i++;
 		end
@@ -81,7 +87,14 @@ module GameLogic(
 			if(gameOver != 2'h0)
 				next_state = HALT; 
 			else
-				next_state = move_block; 
+				next_state = write_block_to_rows_2; 
+			end
+		write_block_to_rows_2:
+			begin
+			if(gameOver != 2'h0)
+				next_state = HALT; 
+			else
+				next_state = add_block; 
 			end
 		//move block loops until stop signal
 		move_block:
@@ -93,6 +106,13 @@ module GameLogic(
 			end 
 		//add block goes to move block unless the game is over			
 		add_block:
+			begin
+			if(gameOver != 2'h0)
+				next_state = HALT; 
+			else
+			next_state = add_block_2;
+			end
+		add_block_2:
 			begin
 			if(gameOver != 2'h0)
 				next_state = HALT; 
@@ -130,18 +150,30 @@ module GameLogic(
 		//write block to rows goes to move_block near unconditionally
 		write_block_to_rows:
 			begin
+			out_state = 3'b000;
+			end
+		write_block_to_rows_2:
+			begin
 			out_state = 3'b010;
 			end
 		//move block loops until stop signal
 		move_block:
 			begin
+			if(i %301 == 0)
 			out_state = 3'b001; 
+			else
+			out_state = 3'b000;
 			end 
 		//add block goes to move block unless the game is over			
 		add_block:
-			begin
+		begin
 		out_state = 3'b100;
 			end
+		add_block_2:
+		begin
+		out_state = 3'b100;
+		end
+		
 		HALT: 
 			begin
 				out_state = 3'b000;
