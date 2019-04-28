@@ -1,7 +1,13 @@
 module Block (input logic clk, reset,
 				input logic [2:0] state, 
 				input logic [9:0] prev, write, collision,
-				output logic [9:0] next, 
+				//if the entire block can shift right or left
+				input logic block_can_shift_right, 
+				input logic block_can_shift_left,
+				input logic can_rotate,
+				//input from the keyboard
+				input logic [7:0] keycode,
+				output logic [9:0] next,
 				//stop the falling and continue
 				output logic Stop,
 				//end the game 
@@ -26,9 +32,9 @@ assign Stop = ((collision & row) == 10'h0000) ? 1'b0:1'b1;
 always_ff @ (posedge clk, posedge reset)
 begin 
  
-if(reset)
+if(reset == 1'b1)
 begin 
-row <= 10'h000;
+row <= 10'h0000;
 //Stop <= 1'b0;
 endgame <= 1'b0;
 end
@@ -74,6 +80,26 @@ else
 	
 	end 
 end
+//if the block is able to move left and right
+else if(state == 3'b111)
+begin
+if((keycode == 8'h07) && block_can_shift_right== 1'b1)
+	begin 
+		row <= (row >> 1);
+	end 
+else if((keycode == 8'h04) && (block_can_shift_left ==1'b1))
+	begin
+		row <= (row << 1);
+	end 
+else if((keycode == 8'h1A) && (can_rotate ==1'b1))
+		row <= 10'h000;
+else 
+	row <= row;
+
+end
+
+
+
 //if in the shift state, does nothing
 else 
 	begin

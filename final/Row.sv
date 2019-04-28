@@ -16,9 +16,9 @@ logic [9:0] row;
 always_ff @ (posedge clk, posedge reset)
 begin 
 
-if(reset)
+if(reset == 1'b1)
 begin 
-row <= 10'h000;
+row <= 10'b0000000000;
 shift <= 0;
 end
 
@@ -27,11 +27,16 @@ end
 else if(state == 3'b000)
 begin 
 //clears row and sends signal to shift
+//if(shift_row == 1'b1 && row == 10'hFFFF)
+//	begin
+//	row <= 10'h0000;
+//	shift <= 1'b0;
+//	end
 if(row == 10'hFFFF)
-	begin
-	row <= 10'h0000;
+begin 
+	row <= row;
 	shift <= 1'b1;
-	end
+end
 //does nothing
 else
 	begin
