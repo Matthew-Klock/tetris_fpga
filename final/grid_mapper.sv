@@ -13,7 +13,7 @@ assign yindex = (DrawY)%20;
 always_comb
 begin
 //out of the playing feild for x
-if(DrawX < 10'd320 || DrawX > 10'd521) 
+if(DrawX < 10'd320 || DrawX > 10'd520) 
 	is_grid = 1'b0;
 else if (DrawY >= 441)
 	is_grid = 1'b0;

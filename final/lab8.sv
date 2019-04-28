@@ -48,7 +48,7 @@ module lab8( input               CLOCK_50,
     
     logic Reset_h, Clk;
     logic [7:0] keycode;
-	 //assign keycode = 8'h1A;
+//	 assign keycode = 8'h06;
     //delete this code
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
@@ -63,8 +63,12 @@ module lab8( input               CLOCK_50,
 	 logic [9:0] DrawX, DrawY;
 	 //tells the color mapper to draw a block or not
 	 logic is_block;
+	 logic is_next_block;
+	 logic is_swap_block;
 	 //tells the color mappper to draw the grid
 	 logic is_grid;
+	 logic is_next_grid;
+	 logic is_swap_grid;
 	 //rows
 	 logic [9:0] rows [21:0];
 	//refreshes rows
@@ -76,6 +80,8 @@ module lab8( input               CLOCK_50,
 	  //tells the blocks if they can shift right or left
 	  logic block_can_shift_right;
 	  logic block_can_shift_left;
+	  logic can_swap;
+	  logic swap_empty;
 	  //tells if the block can rotate 
 	  logic can_rotate;
 	  //tells the next rotation
@@ -106,6 +112,12 @@ module lab8( input               CLOCK_50,
 		logic [2:0] random;
 	  //new blocks
 	  logic [9:0] new_block [1:0];
+	  logic [9:0] next_block [1:0];
+	  logic [9:0] sblock [1:0];
+	  
+	  //score keeping stuff
+	  int score, rows_cleared, level;
+	  
 	 always_ff @ (posedge Clk) begin 
 		  	rows <= rows_in;        
             blocks <= blocks_in;
@@ -174,11 +186,13 @@ module lab8( input               CLOCK_50,
     //used VGA_VS
     GameLogic game(.clk(VGA_VS), .reset(Reset_h), .shift, .stop, .gameOver, .shift_row, .out_state(state), .*); 
 
-	 
+	 scoreKeeper sk( .clk(VGA_VS), .reset(Reset_h), .state, .score, .rows_cleared, .level); 
 
 	 fibonacci_lfsr randomn(.clk(VGA_VS), .reset(Reset_h), .data(random));
 	 
-	 next_Block block(.block(random), .new_block);
+	 swap_block swap(.clk(VGA_VS), .reset(Reset_h), .keycode, .in_block(new_block), .state, .sblock,.swap_empty, .can_swap);
+	 
+	 next_Block block(.clk(VGA_VS), .reset(Reset_h), .state, .block(random), .new_block, .next_block);
 	 //use VGA_VS
 	 block_actions act(.Clk(VGA_VS), .reset(Reset_h), .*);
 	 //use VGA_VS
@@ -186,7 +200,13 @@ module lab8( input               CLOCK_50,
 	 mapper mapp(.rows, .blocks, .map_b);
 
 	 block_mapper bmap(.DrawX, .DrawY, .map, .is_block(is_block));
+	 next_block_mapper nbmap( .DrawX, .DrawY, .map(next_block), .is_next_block);
+	 swap_block_mapper sbmap( .DrawX, .DrawY, .map(sblock), .is_swap_block);
+
 	 grid_mapper gmap(.DrawX, .DrawY, .is_grid);
+	 next_grid_mapper ngmap (.DrawX, .DrawY,.is_next_grid);
+	 swap_grid_mapper sgmap (.DrawX, .DrawY,.is_swap_grid);
+	 
 	 //clocked  off the VGA_VS 
 	 //writes from the map when ws is high
 	 //outputs next to its respective row
@@ -255,7 +275,7 @@ module lab8( input               CLOCK_50,
 	 );
     
     // Display keycode on hex display
-    HexDriver hex_inst_0 (keycode[3:0], HEX0);
-    HexDriver hex_inst_1 (keycode[7:4], HEX1);
+    HexDriver hex_inst_0 (score[3:0], HEX0);
+    HexDriver hex_inst_1 (score[7:4], HEX1);
     
 endmodule

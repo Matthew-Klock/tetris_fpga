@@ -4,6 +4,7 @@ module GameLogic(
 	input logic [1:0] gameOver, 
 	input logic [21:0] shift, stop, 
 	input logic [7:0] keycode,
+	input logic can_swap,
 	input logic can_rotate, 
 	output logic [2:0] out_state,
 	output logic [21:0] shift_row
@@ -126,7 +127,7 @@ module GameLogic(
 				next_state = write_block_to_rows;
 			else if(i%speed == 0)
 				next_state = move_block;
-			else if(keycode == 8'h1A && can_rotate)
+			else if((keycode == 8'h1A && can_rotate) || (keycode == 8'h06 && can_swap))
 				next_state = add_block;
 			else
 				next_state = move_block; 

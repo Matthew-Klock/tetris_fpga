@@ -15,7 +15,11 @@
 
 // color_mapper: Decide which color to be output to VGA for each pixel.
 module  color_mapper ( input              is_block,            // Whether current pixel belongs to ball 
-                       input              is_grid,                                       //   or background (computed in ball.sv)
+                       input 					is_next_block,
+							  input 					is_swap_block,
+							  input              is_grid,
+						     input 					is_swap_grid, 
+							  input 					is_next_grid,       //   or background (computed in ball.sv)
                        input        [9:0] DrawX, DrawY,       // Current pixel coordinates
                        output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
                      );
@@ -30,14 +34,14 @@ module  color_mapper ( input              is_block,            // Whether curren
     // Assign color based on is_ball signal
     always_comb
     begin
-		  if( is_grid == 1'b1)
+		  if( is_grid == 1'b1 || is_swap_grid ==1'b1 || is_next_grid ==1'b1)
 		   begin
             // Gray pieces
             Red = 8'h80;
             Green = 8'h80;
             Blue = 8'h80;
         end
-        else if (is_block == 1'b1) 
+        else if (is_block == 1'b1 || is_next_block == 1'b1 || is_swap_block == 1'b1) 
         begin
             // White pieces
             Red = 8'hff;
