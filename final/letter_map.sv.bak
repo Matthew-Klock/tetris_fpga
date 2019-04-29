@@ -1,0 +1,37 @@
+module letter_map(input logic [9:0] DrawX, DrawY, 
+						output logic [10:0] letter);
+						
+always_comb
+begin
+//S
+if(DrawY >= 400 && DrawY <416 && DrawX >= 100 && DrawX < 108)
+	letter <= 'h53;
+//c
+else if(DrawY >= 400 && DrawY <416 && DrawX >= 108 && DrawX < 116)
+	letter <= 'h53;
+//o
+if(DrawY >= 400 && DrawY <416 && DrawX >= 116 && DrawX < 124)
+	letter <= 'h53;
+//r
+else if(DrawY >= 400 && DrawY <416 && DrawX >= 124 && DrawX < 132)
+	letter <= 'h53;
+//e
+if(DrawY >= 400 && DrawY <416 && DrawX >= 140 && DrawX < 148)
+	letter <= 'h53;
+//:
+else if(DrawY >= 400 && DrawY <416 && DrawX >= 148 && DrawX < 156)
+	letter <= 'h53;
+//0 make numbers 
+if(DrawY >= 400 && DrawY <416 && DrawX >= 156 && DrawX < 164)
+	letter <= 'h53;
+//0 make numbers
+else if(DrawY >= 400 && DrawY <416 && DrawX >= 164 && DrawX < 172)
+	letter <= 'h53;
+
+
+
+end
+
+
+
+endmodule

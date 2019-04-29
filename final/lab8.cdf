@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE115F29) Path("C:/Users/mattk/ECE/ECE_Homework/ece385/FinalProject/tetris_fpga/final/") File("lab8.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE115F29) Path("C:/Users/mattk/ECE/ECE_Homework/ece385/FinalProject/tetris_fpga-master/final/") File("lab8.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 

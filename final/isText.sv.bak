@@ -1,0 +1,29 @@
+module isText 			(input logic [9:0] DrawX, DrawY, 
+							input logic [9:0] map [21:0], 
+							output logic is_block);
+				
+	
+logic [10:0] letter, addr;
+
+logic [7:0] data;
+
+
+
+letter_map(.DrawX, .DrawY, .letter, xOffset);
+assign addr = letter*16+DrawX%8
+
+font_ROM(.addr, .data);	
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+end

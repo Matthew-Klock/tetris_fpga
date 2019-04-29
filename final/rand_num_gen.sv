@@ -5,7 +5,7 @@ module fibonacci_lfsr(
   output [2:0] data
 );
 logic [2:0] data_in ;
-wire feedback = data_in[2] ^ data_in[1] ;
+//wire feedback = data_in[2] ^ data_in[1] ;
 
 
 always_ff @ (posedge clk)
@@ -20,6 +20,7 @@ always_ff @ (posedge clk)
   else
     data_in <= data_in+1 ;
   end
-  assign data = data_in%7;
+
+  assign data =  (data_in == 3'b111) ? 3'b110 : data_in;
  
 endmodule

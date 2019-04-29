@@ -583,6 +583,15 @@ set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "10000 ns" -section_id te
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME testbench -section_id testbench
 set_global_assignment -name ENABLE_SIGNALTAP ON
 set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
+set_global_assignment -name EDA_TIME_SCALE "1 ns" -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_FILE testbench.sv -section_id testbench
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name SYSTEMVERILOG_FILE font_rom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE SpriteSVs/numlookup.sv
+set_global_assignment -name SYSTEMVERILOG_FILE SpriteSVs/letterlookup.sv
+set_global_assignment -name SYSTEMVERILOG_FILE SpriteSVs/tetris_I.sv
 set_global_assignment -name SDC_FILE lab8.sdc
 set_global_assignment -name QIP_FILE lab8_soc/synthesis/lab8_soc.qip
 set_global_assignment -name SYSTEMVERILOG_FILE hpi_io_intf.sv
@@ -598,11 +607,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE next_Block.sv
 set_global_assignment -name SYSTEMVERILOG_FILE mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE block_mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE testbench.sv
-set_global_assignment -name EDA_TIME_SCALE "1 ns" -section_id eda_simulation
-set_global_assignment -name EDA_TEST_BENCH_FILE testbench.sv -section_id testbench
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name SYSTEMVERILOG_FILE grid_mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE block_actions.sv
 set_global_assignment -name SYSTEMVERILOG_FILE centerTracker.sv
@@ -614,4 +618,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE aux_grid_mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE next_block_mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE swap_block.sv
 set_global_assignment -name SYSTEMVERILOG_FILE scoreKeeper.sv
+set_global_assignment -name SYSTEMVERILOG_FILE letter_map.sv
+set_global_assignment -name SYSTEMVERILOG_FILE isText.sv
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

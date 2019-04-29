@@ -18,7 +18,7 @@ output int score, rows_cleared, level
 int score_reg, rows_cleared_reg, level_reg;
 always_ff @ (posedge clk)
 begin
-if(reset == 1'b1)
+if(reset)
 begin 
 score_reg <= 0;
 rows_cleared_reg <= 0;
@@ -48,5 +48,9 @@ end
 
 
 end 
+assign score = score_reg;
+assign level = level_reg;
+assign rows_cleared = rows_cleared_reg;
+
 
 endmodule
