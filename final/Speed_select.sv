@@ -12,7 +12,7 @@ speed = 'd2;
 8'h16:
 speed = 'd10;
 default:
-speed = ('d4 > 'd51-2*level) ?  'd4 :'d51-2*level;
+speed = ('d4 > 'd51-2*level) ?  'd4 :'d51-5*level;
 
 
 

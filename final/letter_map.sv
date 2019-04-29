@@ -212,12 +212,12 @@ else if(DrawY >= 440 && DrawY <456 && DrawX >= 148 && DrawX < 156)
 	end
 else if(DrawY >= 440 && DrawY <456 && DrawX >= 156 && DrawX < 164)
 	begin
-	letter <= ('h30*16+(rows_cleared/10)%10) + (DrawY-440);
+	letter <= ('h30+(rows_cleared/10)%10)*16 + (DrawY-440);
 	xOffset <= DrawX-156;
 	end
 else if(DrawY >= 440 && DrawY <456 && DrawX >= 164 && DrawX < 172)
 	begin
-	letter <= ('h30*16+(rows_cleared)%10) + (DrawY-440);
+	letter <= ('h30+(rows_cleared)%10)*16 + (DrawY-440);
 	xOffset <= DrawX-156;
 	end
 else
