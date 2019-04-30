@@ -1,16 +1,17 @@
 
 State Machine - |lab8|GameLogic:game|state
-Name state.HALT state.add_block_2 state.add_block state.shift_down_rows_2 state.shift_down_rows state.write_block_to_rows_2 state.write_block_to_rows state.move_block state.check_block_2 state.check_block 
-state.check_block 0 0 0 0 0 0 0 0 0 0 
-state.check_block_2 0 0 0 0 0 0 0 0 1 1 
-state.move_block 0 0 0 0 0 0 0 1 0 1 
-state.write_block_to_rows 0 0 0 0 0 0 1 0 0 1 
-state.write_block_to_rows_2 0 0 0 0 0 1 0 0 0 1 
-state.shift_down_rows 0 0 0 0 1 0 0 0 0 1 
-state.shift_down_rows_2 0 0 0 1 0 0 0 0 0 1 
-state.add_block 0 0 1 0 0 0 0 0 0 1 
-state.add_block_2 0 1 0 0 0 0 0 0 0 1 
-state.HALT 1 0 0 0 0 0 0 0 0 1 
+Name state.HALT state.add_block_2 state.add_block state.shift_down_rows_2 state.shift_down_rows state.write_block_to_rows_2 state.write_block_to_rows state.move_block state.check_block_2 state.check_block state.start 
+state.start 0 0 0 0 0 0 0 0 0 0 0 
+state.check_block 0 0 0 0 0 0 0 0 0 1 1 
+state.check_block_2 0 0 0 0 0 0 0 0 1 0 1 
+state.move_block 0 0 0 0 0 0 0 1 0 0 1 
+state.write_block_to_rows 0 0 0 0 0 0 1 0 0 0 1 
+state.write_block_to_rows_2 0 0 0 0 0 1 0 0 0 0 1 
+state.shift_down_rows 0 0 0 0 1 0 0 0 0 0 1 
+state.shift_down_rows_2 0 0 0 1 0 0 0 0 0 0 1 
+state.add_block 0 0 1 0 0 0 0 0 0 0 1 
+state.add_block_2 0 1 0 0 0 0 0 0 0 0 1 
+state.HALT 1 0 0 0 0 0 0 0 0 0 1 
 
 State Machine - |lab8|lab8_soc:nios_system|lab8_soc_sdram:sdram|m_next
 Name m_next.010000000 m_next.000010000 m_next.000001000 m_next.000000001 

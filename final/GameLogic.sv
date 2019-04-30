@@ -6,6 +6,7 @@ module GameLogic(
 	input logic [7:0] keycode,
 	input logic can_swap,
 	input logic can_rotate, 
+	output logic startscreen,
 	output logic [2:0] out_state,
 	output logic [21:0] shift_row
 	); 
@@ -24,7 +25,7 @@ module GameLogic(
 // 111 - move left and right 	
 	enum logic [3:0] {
 	
-	
+						start, 
 						check_block,
 						check_block_2,
 						move_block,
@@ -43,7 +44,7 @@ module GameLogic(
 		begin 
 		if(reset == 1'b1)
 		begin
-			state <= check_block;
+			state <= start;
 			//shift_row_reg <= 21'h0000;
 			i = 1;
 		end
@@ -75,6 +76,13 @@ module GameLogic(
 		//TODO: default values 
 		case(state)
 		//check keeps checking until shift is negative
+		start:
+			begin 
+			if(keycode == 7'h28)
+				next_state = check_block;
+			else 
+				next_state = start;
+			end
 		check_block:     	
 			begin
 
@@ -166,32 +174,43 @@ module GameLogic(
 //TODO make shift rows logic 
 		case(state)
 		//check keeps checking until shift is negative
+		start:
+		begin
+		startscreen = 1'b1;
+		out_state = 3'b000;
+		end
 		check_block:     	
 			begin
 				out_state = 3'b000;
+				startscreen = 1'b0;
 			end 
 		check_block_2:     	
 			begin
 				out_state = 3'b000;
+				startscreen = 1'b0;
 			end 
 		//shift down rows unconditionally goes back to check
 		shift_down_rows:
 			begin 
 				out_state = 3'b011;
+				startscreen = 1'b0;
 			end
 		shift_down_rows_2:
 			begin 
 				out_state = 3'b011;
+				startscreen = 1'b0;
 			   //shift_row_reg = shift_row_cur;
 			end
 		//write block to rows goes to move_block near unconditionally
 		write_block_to_rows:
 			begin
 			out_state = 3'b000;
+			startscreen = 1'b0;
 			end
 		write_block_to_rows_2:
 			begin
 			out_state = 3'b010;
+			startscreen = 1'b0;
 			end
 		//move block loops until stop signal
 		move_block:
@@ -200,24 +219,29 @@ module GameLogic(
 			out_state = 3'b001; 
 			else
 			out_state = 3'b111;
+			startscreen = 1'b0;
 			end 
 		//add block goes to move block unless the game is over			
 		add_block:
 		begin
 		out_state = 3'b100;
+		startscreen = 1'b0;
 			end
 		add_block_2:
 		begin
 		out_state = 3'b100;
+		startscreen = 1'b0;
 		end
 		
 		HALT: 
 			begin
 				out_state = 3'b000;
+				startscreen = 1'b0;
 			end
 		default: 
 		begin
 			out_state = 3'b000;
+			startscreen = 1'b0;
 			//shift_row_reg = shift_row_reg;
 		end
 		endcase
@@ -225,5 +249,6 @@ module GameLogic(
 
 	end
 assign shift_row = shift_row_reg;	
+//assign startscreen = 1'b0;
 shift_row_LUT LUT(.shift, .shift_row(shift_row_cur));
 endmodule 

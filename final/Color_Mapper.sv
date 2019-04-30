@@ -14,13 +14,15 @@
 //-------------------------------------------------------------------------
 
 // color_mapper: Decide which color to be output to VGA for each pixel.
-module  color_mapper ( input              is_block,            // Whether current pixel belongs to ball 
+module  color_mapper ( input 					startscreen, 
+							  input              is_block,            // Whether current pixel belongs to ball 
                        input 					is_next_block,
 							  input 					is_swap_block,
 							  input              is_grid,
 						     input 					is_swap_grid, 
 							  input 					is_next_grid,       //   or background (computed in ball.sv)
 							  input 					is_letter,
+							  input 					is_start,
                        input        [9:0] DrawX, DrawY,       // Current pixel coordinates
                        output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
                      );
@@ -39,6 +41,27 @@ module  color_mapper ( input              is_block,            // Whether curren
     // Assign color based on is_ball signal
     always_comb
     begin
+	 if(startscreen == 1'b1)
+	 begin
+	    if(is_start)
+			  begin
+            // Black
+            Red = 8'h00;
+            Green = 8'h00;
+            Blue = 8'h00;
+        end
+		   else
+			begin
+            // Background with nice color gradient
+            Red = 8'h3f; 
+            Green = 8'h00;
+            Blue = 8'h7f;
+        end
+		  
+	 
+	 end
+	 else
+	 begin
 		  if( is_grid == 1'b1 || is_swap_grid ==1'b1 || is_next_grid ==1'b1)
 		   begin
             // Gray pieces
@@ -67,6 +90,7 @@ module  color_mapper ( input              is_block,            // Whether curren
             Green = 8'h00;
             Blue = 8'h7f;
         end
+		end
     end 
     //numlookup block (.SpriteX(DrawX), .SpriteY(DrawY),.SpriteR(BlockR), .SpriteG(BlockG), .SpriteB(BlockB));
 

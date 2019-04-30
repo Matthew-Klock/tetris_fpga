@@ -46,7 +46,7 @@ module lab8( input               CLOCK_50,
                                  DRAM_CLK      //SDRAM Clock
                     );
     
-    logic sReset, Reset_h, Clk;
+    logic sReset, Reset_h, Clk, gameClk;
     logic [7:0] keycode;
 //	 assign keycode = 8'h06;
     //delete this code
@@ -71,6 +71,8 @@ module lab8( input               CLOCK_50,
 	 logic is_swap_grid;
 	 //tells the color mapper if something is a letter
 	 logic is_letter;
+	 logic is_start;
+	 logic startscreen;
 	 //rows
 	 logic [9:0] rows [21:0];
 	//refreshes rows
@@ -184,21 +186,24 @@ module lab8( input               CLOCK_50,
 	.DrawY
 	 
 	 );
+	 
+	 gameClock_mux gcm(.Clk, .VGA_VS, .gameClk,.reset(sReset), .keycode, .state, .*);
+	 
 	  Speed_select ss(.*);
     //used VGA_VS
-    GameLogic game(.clk(VGA_VS), .reset(sReset), .shift, .stop, .gameOver, .shift_row, .out_state(state), .*); 
+    GameLogic game(.clk(gameClk), .reset(sReset), .shift, .stop, .gameOver, .shift_row, .out_state(state), .*); 
 
-	 scoreKeeper sk( .clk(VGA_VS), .reset(sReset), .state, .score, .rows_cleared, .level); 
+	 scoreKeeper sk( .clk(gameClk), .reset(sReset), .state, .score, .rows_cleared, .level); 
 
-	 fibonacci_lfsr randomn(.clk(VGA_VS), .reset(sReset), .data(random));
+	 fibonacci_lfsr randomn(.clk(gameClk), .reset(sReset), .data(random));
 	 
-	 swap_block swap(.clk(VGA_VS), .reset(sReset), .keycode, .in_block(new_block), .state, .sblock,.swap_empty, .can_swap);
+	 swap_block swap(.clk(gameClk), .reset(sReset), .keycode, .in_block(new_block), .state, .sblock,.swap_empty, .can_swap);
 	 
-	 next_Block block(.clk(VGA_VS), .reset(sReset), .state, .block(random), .new_block, .next_block);
-	 //use VGA_VS
-	 block_actions act(.Clk(VGA_VS), .reset(sReset), .*);
-	 //use VGA_VS
-	 centerTracker center(.Clk(VGA_VS), .reset(sReset), .*);
+	 next_Block block(.clk(gameClk), .reset(sReset), .state, .block(random), .new_block, .next_block);
+	 //use gameClk
+	 block_actions act(.Clk(gameClk), .reset(sReset), .*);
+	 //use gameClk
+	 centerTracker center(.Clk(gameClk), .reset(sReset), .*);
 	 mapper mapp(.rows, .blocks, .map_b);
 
 	 block_mapper bmap(.DrawX, .DrawY, .map, .is_block(is_block));
@@ -210,62 +215,63 @@ module lab8( input               CLOCK_50,
 	 swap_grid_mapper sgmap (.DrawX, .DrawY,.is_swap_grid);
 	 
 	 isText text( .DrawX, .DrawY, .is_letter, .*);
-	 //clocked  off the VGA_VS 
+	 isStart sscreen( .*);
+	 //clocked  off the gameClk 
 	 //writes from the map when ws is high
 	 //outputs next to its respective row
      //takes in shift_row if it is supposed to shift down
      //outputs shift if it detects a full row
-	  //use VGA_VS
-	 Row row21( .clk(VGA_VS), .reset(sReset), .state, .prev(10'b0) ,.write(map[21]), .next(rows_in[21]),    .shift_row(shift_row[21]) , .shift(shift[21]));
-	 Row row20( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[21]) ,.write(map[20]), .next(rows_in[20]), .shift_row(shift_row[20])  , .shift(shift[20]));
-	 Row row19( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[20]) ,.write(map[19]), .next(rows_in[19]), .shift_row(shift_row[19])  , .shift(shift[19]));
-	 Row row18( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[19]) ,.write(map[18]), .next(rows_in[18]),  .shift_row(shift_row[18])  , .shift(shift[18]));
-    Row row17( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[18]) ,.write(map[17]), .next(rows_in[17]),  .shift_row(shift_row[17])  , .shift(shift[17]));
-	 Row row16( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[17]) ,.write(map[16]), .next(rows_in[16]),  .shift_row(shift_row[16])  , .shift(shift[16]));
-	 Row row15( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[16]) ,.write(map[15]), .next(rows_in[15]),  .shift_row(shift_row[15])  , .shift(shift[15]));
-	 Row row14( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[15]) ,.write(map[14]), .next(rows_in[14]),  .shift_row(shift_row[14])  , .shift(shift[14]));
-	 Row row13( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[14]) ,.write(map[13]), .next(rows_in[13]),  .shift_row(shift_row[13])  , .shift(shift[13]));
-	 Row row12( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[13]) ,.write(map[12]), .next(rows_in[12]),  .shift_row(shift_row[12])  , .shift(shift[12])); 
-	 Row row11( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[12]) ,.write(map[11]), .next(rows_in[11]),  .shift_row(shift_row[11])  , .shift(shift[11]));
-	 Row row10( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[11]) ,.write(map[10]), .next(rows_in[10]),  .shift_row(shift_row[10])  , .shift(shift[10]));
-	 Row row09( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[10]) ,.write(map[9]), .next(rows_in[09]),   .shift_row(shift_row[9])  , .shift(shift[9]));
-	 Row row08( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[09]) ,.write(map[8]), .next(rows_in[08]),  .shift_row(shift_row[8])  , .shift(shift[8]));
-     Row row07( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[08]) ,.write(map[7]), .next(rows_in[07]),  .shift_row(shift_row[7])  , .shift(shift[7]));
-	 Row row06( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[07]) ,.write(map[6]), .next(rows_in[06]),  .shift_row(shift_row[6])  , .shift(shift[6]));
-	 Row row05( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[06]) ,.write(map[5]), .next(rows_in[05]),  .shift_row(shift_row[5])  , .shift(shift[5]));
-	 Row row04( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[05]) ,.write(map[4]), .next(rows_in[04]),  .shift_row(shift_row[4])  , .shift(shift[4]));
-	 Row row03( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[04]) ,.write(map[3]), .next(rows_in[03]),  .shift_row(shift_row[3])  , .shift(shift[3]));
-	 Row row02( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[03]) ,.write(map[2]), .next(rows_in[02]),  .shift_row(shift_row[2])  , .shift(shift[2]));
-	 Row row01( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[02]) ,.write(map[1]), .next(rows_in[01]),  .shift_row(shift_row[1])  , .shift(shift[1]));
-     Row row00( .clk(VGA_VS), .reset(sReset), .state, .prev(rows[01]) ,.write(map[0]), .next(rows_in[00]),  .shift_row(shift_row[0])  , .shift(shift[0]));
+	  //use gameClk
+	 Row row21( .clk(gameClk), .reset(sReset), .state, .prev(10'b0) ,.write(map[21]), .next(rows_in[21]),    .shift_row(shift_row[21]) , .shift(shift[21]));
+	 Row row20( .clk(gameClk), .reset(sReset), .state, .prev(rows[21]) ,.write(map[20]), .next(rows_in[20]), .shift_row(shift_row[20])  , .shift(shift[20]));
+	 Row row19( .clk(gameClk), .reset(sReset), .state, .prev(rows[20]) ,.write(map[19]), .next(rows_in[19]), .shift_row(shift_row[19])  , .shift(shift[19]));
+	 Row row18( .clk(gameClk), .reset(sReset), .state, .prev(rows[19]) ,.write(map[18]), .next(rows_in[18]),  .shift_row(shift_row[18])  , .shift(shift[18]));
+    Row row17( .clk(gameClk), .reset(sReset), .state, .prev(rows[18]) ,.write(map[17]), .next(rows_in[17]),  .shift_row(shift_row[17])  , .shift(shift[17]));
+	 Row row16( .clk(gameClk), .reset(sReset), .state, .prev(rows[17]) ,.write(map[16]), .next(rows_in[16]),  .shift_row(shift_row[16])  , .shift(shift[16]));
+	 Row row15( .clk(gameClk), .reset(sReset), .state, .prev(rows[16]) ,.write(map[15]), .next(rows_in[15]),  .shift_row(shift_row[15])  , .shift(shift[15]));
+	 Row row14( .clk(gameClk), .reset(sReset), .state, .prev(rows[15]) ,.write(map[14]), .next(rows_in[14]),  .shift_row(shift_row[14])  , .shift(shift[14]));
+	 Row row13( .clk(gameClk), .reset(sReset), .state, .prev(rows[14]) ,.write(map[13]), .next(rows_in[13]),  .shift_row(shift_row[13])  , .shift(shift[13]));
+	 Row row12( .clk(gameClk), .reset(sReset), .state, .prev(rows[13]) ,.write(map[12]), .next(rows_in[12]),  .shift_row(shift_row[12])  , .shift(shift[12])); 
+	 Row row11( .clk(gameClk), .reset(sReset), .state, .prev(rows[12]) ,.write(map[11]), .next(rows_in[11]),  .shift_row(shift_row[11])  , .shift(shift[11]));
+	 Row row10( .clk(gameClk), .reset(sReset), .state, .prev(rows[11]) ,.write(map[10]), .next(rows_in[10]),  .shift_row(shift_row[10])  , .shift(shift[10]));
+	 Row row09( .clk(gameClk), .reset(sReset), .state, .prev(rows[10]) ,.write(map[9]), .next(rows_in[09]),   .shift_row(shift_row[9])  , .shift(shift[9]));
+	 Row row08( .clk(gameClk), .reset(sReset), .state, .prev(rows[09]) ,.write(map[8]), .next(rows_in[08]),  .shift_row(shift_row[8])  , .shift(shift[8]));
+     Row row07( .clk(gameClk), .reset(sReset), .state, .prev(rows[08]) ,.write(map[7]), .next(rows_in[07]),  .shift_row(shift_row[7])  , .shift(shift[7]));
+	 Row row06( .clk(gameClk), .reset(sReset), .state, .prev(rows[07]) ,.write(map[6]), .next(rows_in[06]),  .shift_row(shift_row[6])  , .shift(shift[6]));
+	 Row row05( .clk(gameClk), .reset(sReset), .state, .prev(rows[06]) ,.write(map[5]), .next(rows_in[05]),  .shift_row(shift_row[5])  , .shift(shift[5]));
+	 Row row04( .clk(gameClk), .reset(sReset), .state, .prev(rows[05]) ,.write(map[4]), .next(rows_in[04]),  .shift_row(shift_row[4])  , .shift(shift[4]));
+	 Row row03( .clk(gameClk), .reset(sReset), .state, .prev(rows[04]) ,.write(map[3]), .next(rows_in[03]),  .shift_row(shift_row[3])  , .shift(shift[3]));
+	 Row row02( .clk(gameClk), .reset(sReset), .state, .prev(rows[03]) ,.write(map[2]), .next(rows_in[02]),  .shift_row(shift_row[2])  , .shift(shift[2]));
+	 Row row01( .clk(gameClk), .reset(sReset), .state, .prev(rows[02]) ,.write(map[1]), .next(rows_in[01]),  .shift_row(shift_row[1])  , .shift(shift[1]));
+     Row row00( .clk(gameClk), .reset(sReset), .state, .prev(rows[01]) ,.write(map[0]), .next(rows_in[00]),  .shift_row(shift_row[0])  , .shift(shift[0]));
     //write is 
 	//stop stops the block from falling 
 	write_mux writemux(.*);
 	
 	
 	
-	Block block21( .clk(VGA_VS), .reset(sReset), .state, .prev(10'b0),       .write(next_write[21]), .collision(rows[20]), .next(blocks_in[21]) , .Stop(stop[21]), .endgame(gameOver[0]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate );
-    Block block20( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[21]), .write(next_write[20]), .collision(rows[19]), .next(blocks_in[20]), .Stop(stop[20]), .endgame(gameOver[1]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block19( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[20]), .write(next_write[19]), .collision(rows[18]), .next(blocks_in[19]), .Stop(stop[19]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block18( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[19]), .write(next_write[18]), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[18]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block17( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[18]), .write(next_write[17]), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[17]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block16( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[17]), .write(next_write[16]), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[16]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block15( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[16]), .write(next_write[15]), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[15]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block14( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[15]), .write(next_write[14]), .collision(rows[13]), .next(blocks_in[14]), .Stop(stop[14]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-	Block block13( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[14]), .write(next_write[13]), .collision(rows[12]), .next(blocks_in[13]), .Stop(stop[13]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block12( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[13]), .write(next_write[12]), .collision(rows[11]), .next(blocks_in[12]), .Stop(stop[12]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block11( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[12]), .write(next_write[11]), .collision(rows[10]), .next(blocks_in[11]), .Stop(stop[11]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block10( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[11]), .write(next_write[10]), .collision(rows[9]), .next(blocks_in[10]), .Stop(stop[10]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block9( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[10]), .write(next_write[9]), .collision(rows[8]), .next(blocks_in[9]), .Stop(stop[9]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block8( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[9]), .write(next_write[8]), .collision(rows[7]), .next(blocks_in[8]), .Stop(stop[8]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block7( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[8]), .write(next_write[7]), .collision(rows[6]), .next(blocks_in[7]), .Stop(stop[7]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block6( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[7]), .write(next_write[6]), .collision(rows[5]), .next(blocks_in[6]), .Stop(stop[6]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block5( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[6]), .write(next_write[5]), .collision(rows[4]), .next(blocks_in[5]), .Stop(stop[5]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block4( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[5]), .write(next_write[4]), .collision(rows[3]), .next(blocks_in[4]), .Stop(stop[4]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block3( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[4]), .write(next_write[3]), .collision(rows[2]), .next(blocks_in[3]), .Stop(stop[3]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block2( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[3]), .write(next_write[2]), .collision(rows[1]), .next(blocks_in[2]), .Stop(stop[2]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block1( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[2]), .write(next_write[1]), .collision(rows[0]), .next(blocks_in[1]), .Stop(stop[1]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
-    Block block0( .clk(VGA_VS), .reset(sReset), .state, .prev(blocks[1]), .write(next_write[0]), .collision(10'hFFFF), .next(blocks_in[0]), .Stop(stop[0]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+	Block block21( .clk(gameClk), .reset(sReset), .state, .prev(10'b0),       .write(next_write[21]), .collision(rows[20]), .next(blocks_in[21]) , .Stop(stop[21]), .endgame(gameOver[0]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate );
+    Block block20( .clk(gameClk), .reset(sReset), .state, .prev(blocks[21]), .write(next_write[20]), .collision(rows[19]), .next(blocks_in[20]), .Stop(stop[20]), .endgame(gameOver[1]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block19( .clk(gameClk), .reset(sReset), .state, .prev(blocks[20]), .write(next_write[19]), .collision(rows[18]), .next(blocks_in[19]), .Stop(stop[19]) ,.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block18( .clk(gameClk), .reset(sReset), .state, .prev(blocks[19]), .write(next_write[18]), .collision(rows[17]), .next(blocks_in[18]), .Stop(stop[18]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block17( .clk(gameClk), .reset(sReset), .state, .prev(blocks[18]), .write(next_write[17]), .collision(rows[16]), .next(blocks_in[17]), .Stop(stop[17]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block16( .clk(gameClk), .reset(sReset), .state, .prev(blocks[17]), .write(next_write[16]), .collision(rows[15]), .next(blocks_in[16]), .Stop(stop[16]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block15( .clk(gameClk), .reset(sReset), .state, .prev(blocks[16]), .write(next_write[15]), .collision(rows[14]), .next(blocks_in[15]), .Stop(stop[15]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block14( .clk(gameClk), .reset(sReset), .state, .prev(blocks[15]), .write(next_write[14]), .collision(rows[13]), .next(blocks_in[14]), .Stop(stop[14]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+	Block block13( .clk(gameClk), .reset(sReset), .state, .prev(blocks[14]), .write(next_write[13]), .collision(rows[12]), .next(blocks_in[13]), .Stop(stop[13]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block12( .clk(gameClk), .reset(sReset), .state, .prev(blocks[13]), .write(next_write[12]), .collision(rows[11]), .next(blocks_in[12]), .Stop(stop[12]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block11( .clk(gameClk), .reset(sReset), .state, .prev(blocks[12]), .write(next_write[11]), .collision(rows[10]), .next(blocks_in[11]), .Stop(stop[11]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block10( .clk(gameClk), .reset(sReset), .state, .prev(blocks[11]), .write(next_write[10]), .collision(rows[9]), .next(blocks_in[10]), .Stop(stop[10]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block9( .clk(gameClk), .reset(sReset), .state, .prev(blocks[10]), .write(next_write[9]), .collision(rows[8]), .next(blocks_in[9]), .Stop(stop[9]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block8( .clk(gameClk), .reset(sReset), .state, .prev(blocks[9]), .write(next_write[8]), .collision(rows[7]), .next(blocks_in[8]), .Stop(stop[8]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block7( .clk(gameClk), .reset(sReset), .state, .prev(blocks[8]), .write(next_write[7]), .collision(rows[6]), .next(blocks_in[7]), .Stop(stop[7]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block6( .clk(gameClk), .reset(sReset), .state, .prev(blocks[7]), .write(next_write[6]), .collision(rows[5]), .next(blocks_in[6]), .Stop(stop[6]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block5( .clk(gameClk), .reset(sReset), .state, .prev(blocks[6]), .write(next_write[5]), .collision(rows[4]), .next(blocks_in[5]), .Stop(stop[5]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block4( .clk(gameClk), .reset(sReset), .state, .prev(blocks[5]), .write(next_write[4]), .collision(rows[3]), .next(blocks_in[4]), .Stop(stop[4]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block3( .clk(gameClk), .reset(sReset), .state, .prev(blocks[4]), .write(next_write[3]), .collision(rows[2]), .next(blocks_in[3]), .Stop(stop[3]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block2( .clk(gameClk), .reset(sReset), .state, .prev(blocks[3]), .write(next_write[2]), .collision(rows[1]), .next(blocks_in[2]), .Stop(stop[2]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block1( .clk(gameClk), .reset(sReset), .state, .prev(blocks[2]), .write(next_write[1]), .collision(rows[0]), .next(blocks_in[1]), .Stop(stop[1]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
+    Block block0( .clk(gameClk), .reset(sReset), .state, .prev(blocks[1]), .write(next_write[0]), .collision(10'hFFFF), .next(blocks_in[0]), .Stop(stop[0]),.block_can_shift_right, .block_can_shift_left, .keycode, .can_rotate);
 	
 	
 	 
